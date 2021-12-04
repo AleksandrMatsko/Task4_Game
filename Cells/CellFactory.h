@@ -22,6 +22,7 @@ public:
     static CellFactory& Instance();
     void Register(const char cell_sym, std::shared_ptr<Cell> cell);
     std::shared_ptr<Cell> getCell(const char cell_sym);
+    bool hasCell(const char cell_sym);
 };
 
 

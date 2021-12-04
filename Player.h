@@ -3,26 +3,37 @@
 
 #include <vector>
 #include <string>
+#include "Field.h"
 
 enum class Direction {
     UP,
     DOWN,
     LEFT,
-    RIGHT
+    RIGHT,
+    NONE
 };
 
 class Player {
 private:
     std::pair<int, int> _pos;
-    std::vector<char> _open_field;
+    std::shared_ptr<OpenField> _open_field;
+    bool _skip_turn;
+    bool _can_shoot;
 
 protected:
     std::vector<char>& getOpenField();
 
 public:
-    bool makeTurn(const std::string& action, Direction direction);
+    Player(const std::pair<int, int> start_pos, const int width, const int height);
+
+    std::pair<std::string, Direction> chooseAction();
+    void setPosition(const std::pair<int, int>& new_pos);
     std::pair<int, int> getPosition();
-    void setField(std::vector<char>& field);
+    bool isSkip();
+    bool canShoot();
+    void setShootMode(bool mode);
+    void setSkipMode(bool mode);
+    std::shared_ptr<OpenField> getOpenedField();
 };
 
 
