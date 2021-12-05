@@ -13,13 +13,17 @@ private:
 
 public:
     Wall();
-    const bool canStand() {
+
+    char getCellSym() {
+        return _cell_sym;
+    }
+    bool canStand() {
         return _passable;
     }
-    const bool canInteract() {
+    bool canInteract() {
         return _interactive;
     }
-    const bool canShootThrough() {
+    bool canShootThrough() {
         return _shoot_through;
     }
 };
@@ -33,13 +37,17 @@ private:
 
 public:
     Passage();
-    const bool canStand() {
+
+    char getCellSym() {
+        return _cell_sym;
+    }
+    bool canStand() {
         return _passable;
     }
-    const bool canInteract() {
+    bool canInteract() {
         return _interactive;
     }
-    const bool canShootThrough() {
+    bool canShootThrough() {
         return _shoot_through;
     }
 };
@@ -53,13 +61,17 @@ private:
 
 public:
     Exit();
-    const bool canStand() {
+
+    char getCellSym() {
+        return _cell_sym;
+    }
+    bool canStand() {
         return _passable;
     }
-    const bool canInteract() {
+    bool canInteract() {
         return _interactive;
     }
-    const bool canShootThrough() {
+    bool canShootThrough() {
         return _shoot_through;
     }
 };
@@ -73,13 +85,17 @@ private:
 
 public:
     Treasure();
-    const bool canStand() {
+
+    char getCellSym() {
+        return _cell_sym;
+    }
+    bool canStand() {
         return _passable;
     }
-    const bool canInteract() {
+    bool canInteract() {
         return _interactive;
     }
-    const bool canShootThrough() {
+    bool canShootThrough() {
         return _shoot_through;
     }
 };

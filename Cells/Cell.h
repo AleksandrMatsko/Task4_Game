@@ -3,9 +3,10 @@
 
 class Cell {
 public:
-    virtual const bool canStand() = 0;
-    virtual const bool canInteract() = 0;
-    virtual const bool canShootThrough() = 0;
+    virtual char getCellSym() = 0;
+    virtual bool canStand() = 0;
+    virtual bool canInteract() = 0;
+    virtual bool canShootThrough() = 0;
     virtual ~Cell() {}
 };
 

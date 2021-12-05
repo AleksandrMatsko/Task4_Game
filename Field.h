@@ -1,6 +1,7 @@
 #ifndef TASK4_GAME_FIELD_H
 #define TASK4_GAME_FIELD_H
 
+#include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
@@ -19,6 +20,7 @@ public:
     const std::vector<char>& getField();
     int getHeight();
     int getWidth();
+    void printField(std::ostream& out);
 };
 
 class OpenField : public Field {

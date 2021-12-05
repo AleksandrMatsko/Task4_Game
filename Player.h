@@ -20,13 +20,10 @@ private:
     bool _skip_turn;
     bool _can_shoot;
 
-protected:
-    std::vector<char>& getOpenField();
-
 public:
-    Player(const std::pair<int, int> start_pos, const int width, const int height);
+    Player(const std::pair<int, int>& start_pos, int width, int height);
 
-    std::pair<std::string, Direction> chooseAction();
+    std::pair<std::string, Direction> chooseAction(std::istream& in, std::ostream& out);
     void setPosition(const std::pair<int, int>& new_pos);
     std::pair<int, int> getPosition();
     bool isSkip();

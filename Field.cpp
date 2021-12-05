@@ -59,6 +59,15 @@ int Field::getWidth() {
     return _width;
 }
 
+void Field::printField(std::ostream& out) {
+    for (int i = 0; i < _height; i++) {
+        for (int j = 0; j < _width; j++) {
+            out << _field[i * _width + j] << " ";
+        }
+        out << std::endl;
+    }
+}
+
 OpenField::OpenField(const std::pair<int, int> &pos, const int width, const int height) {
     int size = width * height;
     _field = std::vector<char>(size);
