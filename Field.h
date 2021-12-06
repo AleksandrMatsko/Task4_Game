@@ -15,12 +15,12 @@ private:
 
 public:
     Field();
-    char viewCell(const std::pair<int, int>& pos);
-    void changeCell(const std::pair<int, int>& pos, const char new_cell_sym);
+    virtual char viewCell(const std::pair<int, int>& pos);
+    virtual void changeCell(const std::pair<int, int>& pos, const char new_cell_sym);
     const std::vector<char>& getField();
     int getHeight();
     int getWidth();
-    void printField(std::ostream& out);
+    virtual void printField(std::ostream& out);
 };
 
 class OpenField : public Field {
@@ -31,6 +31,9 @@ private:
 
 public:
     OpenField(const std::pair<int, int>& pos, const int width, const int height);
+    virtual char viewCell(const std::pair<int, int>& pos);
+    virtual void changeCell(const std::pair<int, int>& pos, const char new_cell_sym);
+    virtual void printField(std::ostream& out);
 };
 
 

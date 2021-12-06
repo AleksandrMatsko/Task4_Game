@@ -2,14 +2,14 @@
 
 Field::Field() {
     _field = {'*', '*', '*', '*', '*', '*', '*', '*', '*',
-              '*', '0', '0', '0', '3', '0', '0', '0', '*',
-              '*', '1', '*', '*', '*', '0', '*', 'T', '*',
-              '*', '0', '0', '*', '0', '0', '0', '*', '*',
-              '*', '0', '*', '*', '*', '0', '*', '*', '*',
-              '*', '0', '4', '0', '0', '0', '0', '0', '*',
-              '*', '0', '*', '0', '*', '*', '0', '2', '*',
-              '*', '0', '0', '0', '*', '0', '0', '*', '*',
-              '*', '*', '*', 'E', '*', '*', '*', '*', '*'};
+              '*', '0', '1', '0', '*', '0', '0', '0', '*',
+              '*', '0', '*', '0', '0', '0', '*', 'T', '*',
+              '*', '0', '0', '*', '*', '0', '3', '*', '*',
+              '*', '0', '*', '*', '0', '0', '0', '*', '*',
+              '*', '0', '4', '0', '0', '*', '0', '2', '*',
+              '*', '0', '*', '0', '*', '0', '*', '0', '*',
+              '*', '0', '0', '0', '*', '0', '0', '0', '*',
+              '*', '*', 'E', '*', '*', '*', '*', '*', '*'};
     _width = 9;
     _height = _field.size() / _width;
     if (_field.size() != _width * _height) {
@@ -75,4 +75,44 @@ OpenField::OpenField(const std::pair<int, int> &pos, const int width, const int 
         _field[i] = '?';
     }
     _field[pos.first * width + pos.second] = 'P';
+    _width = width;
+    _height = height;
+}
+
+void OpenField::printField(std::ostream &out) {
+    int num_fake_lines = 1;
+    for (int i = 0; i < _width + 4; i++) {
+        out << "? ";
+        if (i == _width + 3 && num_fake_lines < 2) {
+            i = -1;
+            num_fake_lines += 1;
+            out << std::endl;
+        }
+    }
+    out << std::endl;
+    for (int i = 0; i < _height; i++) {
+        out << "? ? ";
+        for (int j = 0; j < _width; j++) {
+            out << _field[i * _width + j] << " ";
+        }
+        out << "? ?" << std::endl;
+    }
+    num_fake_lines = 1;
+    for (int i = 0; i < _width + 4; i++) {
+        out << "? ";
+        if (i == _width + 3 && num_fake_lines < 2) {
+            i = -1;
+            num_fake_lines += 1;
+            out << std::endl;
+        }
+    }
+    out << std::endl;
+}
+
+char OpenField::viewCell(const std::pair<int, int> &pos) {
+    return _field[pos.first * _width + pos.second];
+}
+
+void OpenField::changeCell(const std::pair<int, int> &pos, const char new_cell_sym) {
+    _field[pos.first * _width + pos.second] = new_cell_sym;
 }

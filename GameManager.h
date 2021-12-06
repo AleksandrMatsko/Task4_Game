@@ -15,7 +15,7 @@ private:
     bool _end_game;
 
     GameManager(const std::list<std::string>& player_names);
-    void makeTurn(const std::string& player_name, const std::pair<std::string, Direction>& action,
+    bool makeTurn(const std::string& player_name, const std::pair<std::string, Direction>& action,
                   std::istream& in, std::ostream& out);
     std::pair<int, int> movePos(const std::pair<int, int>& pos, Direction direction);
 
@@ -25,6 +25,7 @@ public:
 
     static GameManager& Instance(const std::list<std::string>& player_names);
     bool makeRound(std::istream& in, std::ostream& out);
+    const std::string& getHoldTreasure();
 };
 
 

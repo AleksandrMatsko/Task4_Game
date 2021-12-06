@@ -7,13 +7,16 @@ namespace {
         }
     }
 
-    std::string GetAction(std::istream& in, std::ostream& out) {
+    std::string GetAction(std::istream& in, std::ostream& out, bool shoot_possible) {
         out << "Please choose one action:" << std::endl;
         std::string action;
         while (true) {
             in >> action;
             ToLower(action);
-            if (action == "move" || action == "shoot") {
+            if (action == "move") {
+                return action;
+            }
+            if (action == "shoot" && shoot_possible) {
                 return action;
             }
             out << "Please choose one action:" << std::endl;
@@ -59,8 +62,12 @@ std::pair<std::string, Direction> Player::chooseAction(std::istream& in, std::os
     if (_can_shoot) {
         out << "- shoot" << std::endl;
     }
-    auto action = GetAction(in, out);
+    auto action = GetAction(in, out, _can_shoot);
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     auto direction = GetDirection(in, out);
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     return std::make_pair(action, direction);
 }
 

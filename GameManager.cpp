@@ -50,6 +50,13 @@ GameManager::GameManager(const std::list<std::string>& player_names) {
         _hold_treasure = "";
         i += 1;
     }
+    if (i == '1') {
+        _end_game = true;
+    }
+    for (i; i < '5'; i++) {
+        auto pos = GetStartPosition(i, _field);
+        _field->changeCell(pos, '0');
+    }
 }
 
 GameManager& GameManager::Instance(const std::list<std::string>& player_names) {
@@ -74,7 +81,7 @@ std::pair<int, int> GameManager::movePos(const std::pair<int, int>& pos, Directi
     return new_pos;
 }
 
-void GameManager::makeTurn(const std::string &player_name, const std::pair<std::string, Direction>& action, std::istream& in, std::ostream& out) {
+bool GameManager::makeTurn(const std::string &player_name, const std::pair<std::string, Direction>& action, std::istream& in, std::ostream& out) {
     if (action.first == "move") {
         auto new_pos = _players[player_name]->getPosition();
         new_pos = movePos(new_pos, action.second);
@@ -100,14 +107,17 @@ void GameManager::makeTurn(const std::string &player_name, const std::pair<std::
                     bool answer = GetAnswer(in, out);
                     if (answer && _hold_treasure != player_name) {
                         _players.erase(player_name);
-                        return;
+                        if (_players.empty()) {
+                            _end_game = true;
+                        }
+                        return true;
                     }
                     if (answer && _hold_treasure == player_name) {
                         _end_game = true;
-                        return;
+                        return true;
                     }
                     if (!answer) {
-                        return;
+                        return false;
                     }
                 }
             }
@@ -153,28 +163,62 @@ void GameManager::makeTurn(const std::string &player_name, const std::pair<std::
         else {
             out << "You haven't shot anybody" << std::endl;
         }
+        _players[player_name]->setShootMode(false);
     }
+    return false;
 }
 
 bool GameManager::makeRound(std::istream& in, std::ostream& out) {
+    if (_end_game) {
+        return false;
+    }
     for (auto & player : _players) {
         out << "Turn: " << player.first << std::endl;
         player.second->getOpenedField()->printField(out);
-        if (!player.second->canShoot() && player.first != _hold_treasure) {
-            player.second->setShootMode(true);
-        }
         if (!player.second->isSkip()) {
+            if (player.first == _hold_treasure) {
+                std::cout << "You hold treasure" << std::endl;
+            }
+            else if (!_hold_treasure.empty()) {
+                std::cout << "Someone hold treasure" << std::endl;
+            }
             auto action = player.second->chooseAction(in, out);
-            makeTurn(player.first, action, in, out);
-            player.second->getOpenedField()->printField(out);
+            if (player.first != _hold_treasure) {
+                player.second->setShootMode(true);
+            }
+            bool left_game = makeTurn(player.first, action, in, out);
+            if (!left_game) {
+                player.second->getOpenedField()->printField(out);
+                std::string end_turn;
+                std::cout << "Enter anything to end turn" << std::endl;
+                std::cin >> end_turn;
+            }
+            for (int i = 0; i < 25; i++) {
+                std::cout << std::endl;
+            }
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         else {
-            out << "You've been shot" << std::endl;
+            std::string end_turn;
+            out << "You've been shot, so you need one turn to heal" << std::endl;
+            std::cout << "Enter anything to end turn" << std::endl;
+            std::cin >> end_turn;
+            for (int i = 0; i < 25; i++) {
+                std::cout << std::endl;
+            }
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             player.second->setSkipMode(false);
+            player.second->setShootMode(true);
         }
         if (_end_game) {
             return false;
         }
     }
     return true;
+}
+
+const std::string &GameManager::getHoldTreasure() {
+    return _hold_treasure;
 }
