@@ -1,23 +1,25 @@
 #include "Player.h"
 
-namespace {
-    void ToLower(std::string& str) {
+namespace StrModifier {
+    void ToLower(std::string &str) {
         for (int i = 0; i < str.size(); i++) {
             str[i] = char(std::tolower(str[i]));
         }
     }
+}
 
-    std::string GetAction(std::istream& in, std::ostream& out, bool shoot_possible) {
+namespace {
+    std::string GetNameAction(std::istream& in, std::ostream& out, std::map<std::string, bool> possible_actions) {
         out << "Please choose one action:" << std::endl;
         std::string action;
         while (true) {
             in >> action;
-            ToLower(action);
-            if (action == "move") {
-                return action;
-            }
-            if (action == "shoot" && shoot_possible) {
-                return action;
+            StrModifier::ToLower(action);
+            if (possible_actions.find(action) != possible_actions.end()) {
+                bool available = possible_actions[action];
+                if (available) {
+                    return action;
+                }
             }
             out << "Please choose one action:" << std::endl;
         }
@@ -28,7 +30,7 @@ namespace {
         std::string direction;
         while (true) {
             in >> direction;
-            ToLower(direction);
+            StrModifier::ToLower(direction);
             if (direction == "up") {
                 return Direction::UP;
             }
@@ -46,11 +48,11 @@ namespace {
     }
 }
 
-Player::Player(const std::pair<int, int>& start_pos, int width, int height) {
+Player::Player(const std::pair<int, int>& start_pos, int width, int height, const std::map<std::string, bool>& possible_actions) {
     _pos = start_pos;
     _open_field = std::make_shared<OpenField>(start_pos, width, height);
     _skip_turn = false;
-    _can_shoot = true;
+    _possible_actions = possible_actions;
 }
 
 std::pair<std::string, Direction> Player::chooseAction(std::istream& in, std::ostream& out) {
@@ -58,17 +60,18 @@ std::pair<std::string, Direction> Player::chooseAction(std::istream& in, std::os
         //exception
     }
     out << "You can do these actions:" << std::endl;
-    out << "- move" << std::endl;
-    if (_can_shoot) {
-        out << "- shoot" << std::endl;
+    for (auto & it: _possible_actions){
+        if (it.second) {
+            out << "- " << it.first << std::endl;
+        }
     }
-    auto action = GetAction(in, out, _can_shoot);
+    auto action_name = GetNameAction(in, out, _possible_actions);
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     auto direction = GetDirection(in, out);
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    return std::make_pair(action, direction);
+    return std::make_pair(action_name, direction);
 }
 
 void Player::setPosition(const std::pair<int, int>& new_pos) {
@@ -83,12 +86,8 @@ bool Player::isSkip() {
     return _skip_turn;
 }
 
-bool Player::canShoot() {
-    return _can_shoot;
-}
-
-void Player::setShootMode(bool mode) {
-    _can_shoot = mode;
+void Player::setActionMode(const std::string &action, bool mode) {
+    _possible_actions[action] = mode;
 }
 
 void Player::setSkipMode(bool mode) {
@@ -97,4 +96,8 @@ void Player::setSkipMode(bool mode) {
 
 std::shared_ptr<OpenField> Player::getOpenedField() {
     return _open_field;
+}
+
+bool Player::isAvailable(const std::string& action) {
+    return _possible_actions[action];
 }

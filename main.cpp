@@ -5,7 +5,7 @@ int main() {
     std::string input;
     int num_players;
     while (true) {
-        std::cout << "Please enter number of players:" << std::endl;
+        std::cout << "Please enter number of players (from 1 to 4):" << std::endl;
         std::cin >> input;
         if (input.find_first_not_of("01234567890") == std::string::npos) {
             num_players = std::stoi(input);
@@ -23,8 +23,8 @@ int main() {
         std::getline(std::cin, input);
         player_names.emplace_back(input);
     }
-    bool end_game = true;
-    while (end_game) {
+    bool end_game = false;
+    while (!end_game) {
         end_game = GameManager::Instance(player_names).makeRound(std::cin, std::cout);
     }
     std::string winner = GameManager::Instance(player_names).getHoldTreasure();
