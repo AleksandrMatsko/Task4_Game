@@ -12,15 +12,7 @@ Field::Field() {
               '*', '*', 'E', '*', '*', '*', '*', '*', '*'};
     _width = 9;
     _height = _field.size() / _width;
-    if (_field.size() != _width * _height) {
-        //exception
-    }
-    for (auto & i : _field) {
-        if (('0' > i || i > '9') && !CellFactory::Instance().hasCell(i)) {
-            //exception
-        }
-    }
-    /*std::srand(time(NULL));
+    std::srand(std::time(nullptr));
     int flip_x = std::rand() % 2;
     int flip_y = std::rand() % 2;
     if (flip_x) {
@@ -36,7 +28,7 @@ Field::Field() {
                 std::swap(_field[i * _width + j], _field[(_height - 1 - i) * _width + j]);
             }
         }
-    }*/
+    }
 }
 
 const std::vector<char>& Field::getField() {
@@ -80,6 +72,7 @@ OpenField::OpenField(const std::pair<int, int> &pos, const int width, const int 
 }
 
 void OpenField::printField(std::ostream &out) {
+    out << "--------------------------" << std::endl;
     int num_fake_lines = 1;
     for (int i = 0; i < _width + 4; i++) {
         out << "? ";
@@ -107,6 +100,7 @@ void OpenField::printField(std::ostream &out) {
         }
     }
     out << std::endl;
+    out << "--------------------------" << std::endl;
 }
 
 char OpenField::viewCell(const std::pair<int, int> &pos) {

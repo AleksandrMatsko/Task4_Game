@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include "Cell.h"
+#include "../Exceptions/Exception.h"
 
 template <typename T>
 std::shared_ptr<Cell> makeCell() {
@@ -20,9 +21,9 @@ public:
     CellFactory& operator=(CellFactory& b) = delete;
 
     static CellFactory& Instance();
-    void Register(const char cell_sym, std::shared_ptr<Cell> cell);
-    std::shared_ptr<Cell> getCell(const char cell_sym);
-    bool hasCell(const char cell_sym);
+    void Register(char cell_sym, std::shared_ptr<Cell> cell);
+    std::shared_ptr<Cell> getCell(char cell_sym);
+    bool hasCell(char cell_sym);
 };
 
 
