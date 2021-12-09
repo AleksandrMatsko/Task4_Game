@@ -2,7 +2,6 @@
 #define TASK4_GAME_BOT_H
 
 #include <list>
-
 #include <stack>
 #include "Player.h"
 
@@ -39,6 +38,7 @@ public:
     bool isTreasureKeeper();
     void setTreasureHold(bool treasure_is_hold);
     void setTreasureKeeper(bool i_hold_treasure);
+    void setExitFound(bool exit_found);
 };
 
 

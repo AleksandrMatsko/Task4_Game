@@ -41,11 +41,12 @@ int main() {
         end_game = GameManager::Instance(player_names).makeRound(std::cin, std::cout);
     }
     std::string winner = GameManager::Instance(player_names).getHoldTreasure();
+    std::cout << std::endl;
     if (winner.empty()) {
         std::cout << "Nobody win" << std::endl;
     }
     else {
-        std::cout << "Winner: " << winner << std::endl;
+        std::cout << "!!!  Winner: " << winner << "  !!!" << std::endl;
     }
     std::cout << std::endl;
     GameManager::Instance(player_names).getField()->printField(std::cout);

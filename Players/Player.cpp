@@ -95,9 +95,6 @@ Player::Player(const std::pair<int, int>& start_pos, int width, int height,
 }
 
 std::pair<std::string, Direction> Player::chooseAction(std::istream& in, std::ostream& out) {
-    if (_skip_turn) {
-        //exception
-    }
     out << "You can do these actions:" << std::endl;
     for (auto & it: _possible_actions){
         if (it.second) {
@@ -162,4 +159,8 @@ void Player::setTreasureKeeper(bool i_hold_treasure) {
     if (_i_hold_treasure) {
         _treasure_is_hold = _i_hold_treasure;
     }
+}
+
+void Player::setExitFound(bool exit_found) {
+    return;
 }

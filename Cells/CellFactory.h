@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include "Cell.h"
+#include "../Exceptions/Exception.h"
 
 template <typename T>
 std::shared_ptr<Cell> makeCell() {

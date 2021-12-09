@@ -26,13 +26,14 @@ std::map<Direction, std::pair<int, int>> Bot::getCandidates(std::pair<int, int> 
         if (cell_sym == 'P') {
             continue;
         }
-        if (cell_sym != '?') {
+        if (cell_sym != '?' && cell_sym != 'E') {
             auto cell = CellFactory::Instance().getCell(cell_sym);
             if (!cell->canStand()) {
                 continue;
             }
         }
         candidates[direction] = new_pos;
+
     }
     return candidates;
 }
@@ -135,30 +136,21 @@ std::pair<std::string, Direction> Bot::chooseAction(std::istream &in, std::ostre
             direction = all_directions[rand_index];
             ret = std::make_pair("move", direction);
         }
-        else if (candidates.size() == 1) {
-            direction = candidates.begin()->first;
-            ret = std::make_pair("move", direction);
-        }
         else {
             while (!_path_to_undiscovered.empty()) {
                 _path_to_undiscovered.pop();
             }
             _path_to_undiscovered = findPathToUndiscovered(_pos);
-            if (_path_to_undiscovered.empty()) {
-                //exception invalid maze
-            }
             direction = _path_to_undiscovered.top();
             ret = std::make_pair("move", direction);
             _path_to_undiscovered.pop();
         }
     }
-    if (_exit_found && !_i_hold_treasure && direction != Direction::NONE) {
-        _path_exit.push(!direction);
-    }
     if (_exit_found && _i_hold_treasure) {
         direction = _path_exit.top();
         ret = std::make_pair("move", direction);
         _path_exit.pop();
+        return ret;
     }
     if (_treasure_is_hold && isAvailable("shoot")) {
         auto candidates = getCandidates(_pos);
@@ -168,6 +160,12 @@ std::pair<std::string, Direction> Bot::chooseAction(std::istream &in, std::ostre
         }
         direction = all_directions[rand_index];
         ret = std::make_pair("shoot", direction);
+    }
+    if (ret.first.empty()) {
+        ret.first = "move";
+    }
+    if (_exit_found && !_i_hold_treasure && direction != Direction::NONE) {
+        _path_exit.push(!direction);
     }
     return ret;
 }
@@ -218,7 +216,8 @@ void Bot::setTreasureHold(bool treasure_is_hold) {
 
 void Bot::setTreasureKeeper(bool i_hold_treasure) {
     _i_hold_treasure = i_hold_treasure;
-    if (_i_hold_treasure) {
-        _treasure_is_hold = _i_hold_treasure;
-    }
+}
+
+void Bot::setExitFound(bool exit_found) {
+    _exit_found = exit_found;
 }

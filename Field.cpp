@@ -12,15 +12,7 @@ Field::Field() {
               '*', '*', 'E', '*', '*', '*', '*', '*', '*'};
     _width = 9;
     _height = _field.size() / _width;
-    if (_field.size() != _width * _height) {
-        //exception
-    }
-    for (auto & i : _field) {
-        if (('0' > i || i > '9') && !CellFactory::Instance().hasCell(i)) {
-            //exception
-        }
-    }
-    /*std::srand(std::time(nullptr));
+    std::srand(std::time(nullptr));
     int flip_x = std::rand() % 2;
     int flip_y = std::rand() % 2;
     if (flip_x) {
@@ -36,7 +28,7 @@ Field::Field() {
                 std::swap(_field[i * _width + j], _field[(_height - 1 - i) * _width + j]);
             }
         }
-    }*/
+    }
 }
 
 const std::vector<char>& Field::getField() {

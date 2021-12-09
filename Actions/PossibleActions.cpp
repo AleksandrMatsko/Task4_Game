@@ -120,6 +120,7 @@ bool Move::doAction(const std::string& player_name,
                         return true;
                     }
                     if (!answer) {
+                        players[player_name]->getOpenedField()->changeCell(new_pos, what);
                         return false;
                     }
                 }
@@ -172,7 +173,6 @@ bool Shoot::doAction(const std::string& player_name,
                         player.second->setTreasureHold(false);
                     }
                     field->changeCell(pos, 'T');
-
                 }
             }
         }

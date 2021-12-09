@@ -33,7 +33,8 @@ GameManager::GameManager(const std::list<std::string>& player_names) {
     for (auto & player: _names) {
         char index = rand() % max_num_players;
         auto pos = GetStartPosition(numbers[index], _field);
-        _players[player] = std::make_shared<Player>(pos, _field->getWidth(), _field->getHeight(), possible_actions);
+        _players[player] = std::make_shared<Player>(pos, _field->getWidth(),
+                                                    _field->getHeight(), possible_actions);
         _hold_treasure = "";
         numbers.erase(numbers.begin() + index);
         max_num_players -= 1;
@@ -45,7 +46,8 @@ GameManager::GameManager(const std::list<std::string>& player_names) {
             bot_name += std::to_string(char(rand() % 64));
         }
         _names.emplace_back(bot_name);
-        _players[bot_name] = std::make_shared<Bot>(pos, _field->getWidth(), _field->getHeight(), possible_actions);
+        _players[bot_name] = std::make_shared<Bot>(pos, _field->getWidth(),
+                                                   _field->getHeight(), possible_actions);
     }
 }
 
@@ -79,16 +81,15 @@ bool GameManager::makeRound(std::istream& in, std::ostream& out) {
                 out << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
                 out << std::endl;
             }
-            Additional::operateTreasure(_players[name]->getPosition(), name, _players, _field, in, out,
-                            _hold_treasure);
+            Additional::operateTreasure(_players[name]->getPosition(), name, _players,
+                                        _field, in, out, _hold_treasure);
             auto action_information = _players[name]->chooseAction(in, out);
             if (!_players[name]->isTreasureKeeper()) {
                 _players[name]->setActionMode("shoot", true);
             }
-
             auto action = ActionFactory::Instance().getAction(action_information.first);
             action->doAction(name, _players, _field, action_information.second,
-                                            in, out, _hold_treasure, _end_game);
+                             in, out, _hold_treasure, _end_game);
             if (_end_game) {
                 return true;
             }

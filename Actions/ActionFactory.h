@@ -4,6 +4,7 @@
 #include <list>
 #include <functional>
 #include "Action.h"
+#include "../Exceptions/Exception.h"
 
 template <typename T>
 std::shared_ptr<Action> actionMaker() {

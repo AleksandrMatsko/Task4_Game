@@ -20,4 +20,4 @@ add_executable(Task4_Game
         Actions/ActionFactory.cpp
         Actions/ActionFactory.h
         Actions/PossibleActions.cpp
-        Actions/PossibleActions.h Players/Bot.cpp Players/Bot.h)
+        Actions/PossibleActions.h Players/Bot.cpp Players/Bot.h Exceptions/Exception.cpp Exceptions/Exception.h)

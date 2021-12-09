@@ -7,7 +7,7 @@ ActionFactory& ActionFactory::Instance() {
 
 void ActionFactory::Register(const std::string &act_name, std::shared_ptr<Action> action) {
     if (hasAction(act_name)) {
-        //exception
+        throw InvalidActionRegistration(act_name);
     }
     _actions[act_name] =  std::move(action);
     _reg_actions.emplace_back(act_name);
@@ -15,7 +15,7 @@ void ActionFactory::Register(const std::string &act_name, std::shared_ptr<Action
 
 std::shared_ptr<Action> ActionFactory::getAction(const std::string& act_name) {
     if (!hasAction(act_name)) {
-        //exception
+        throw InvalidActionName(act_name);
     }
     return _actions[act_name];
 }
