@@ -1,7 +1,7 @@
 #include "GameManager.h"
 
 int main() {
-    //print rules;
+    std::cout << rules;
     std::string input;
     int num_players;
     while (true) {
@@ -21,7 +21,20 @@ int main() {
     for (int i = 0; i < num_players; i++) {
         std::cout << "Please enter the name of " << i + 1 << " player" << std::endl;
         std::getline(std::cin, input);
-        player_names.emplace_back(input);
+        bool is_unique = true;
+        for (auto & name : player_names) {
+            if (name == input) {
+                i -= 1;
+                is_unique = false;
+                break;
+            }
+        }
+        if (is_unique) {
+            player_names.emplace_back(input);
+        }
+        else  {
+            std::cout << "Name already entered" << std::endl;
+        }
     }
     bool end_game = false;
     while (!end_game) {
@@ -34,5 +47,7 @@ int main() {
     else {
         std::cout << "Winner: " << winner << std::endl;
     }
+    std::cout << std::endl;
+    GameManager::Instance(player_names).getField()->printField(std::cout);
     return 0;
 }

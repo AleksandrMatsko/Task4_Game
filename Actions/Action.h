@@ -2,7 +2,7 @@
 #define TASK4_GAME_ACTION_H
 
 #include <memory>
-#include "../Player.h"
+#include "../Players/Bot.h"
 
 namespace Additional {
     bool GetAnswer(std::istream& in, std::ostream& out);

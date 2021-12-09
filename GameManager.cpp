@@ -19,7 +19,7 @@ namespace {
 }
 
 GameManager::GameManager(const std::list<std::string>& player_names) {
-    srand(time(NULL));
+    std::srand(std::time(nullptr));
     _names = player_names;
     _end_game = false;
     _field = std::make_shared<Field>();
@@ -38,15 +38,14 @@ GameManager::GameManager(const std::list<std::string>& player_names) {
         numbers.erase(numbers.begin() + index);
         max_num_players -= 1;
     }
-    if (max_num_players == 4) {
-        _end_game = true;
-    }
-    for (char i = '1'; i < '5'; i++) {
-        auto pos = GetStartPosition(i, _field);
-        if (pos.first == INT_MAX && pos.second == INT_MAX) {
-            continue;
+    for (auto number : numbers) {
+        auto pos = GetStartPosition(number, _field);
+        std::string bot_name = "Bot_" + std::to_string(number);
+        while (_players.find(bot_name) != _players.end()) {
+            bot_name += std::to_string(char(rand() % 64));
         }
-        _field->changeCell(pos, '0');
+        _names.emplace_back(bot_name);
+        _players[bot_name] = std::make_shared<Bot>(pos, _field->getWidth(), _field->getHeight(), possible_actions);
     }
 }
 
@@ -60,15 +59,18 @@ bool GameManager::makeRound(std::istream& in, std::ostream& out) {
         return true;
     }
     for (auto & name : _names) {
+        if (_players.find(name) == _players.end()) {
+            continue;
+        }
         out << "Turn: " << name << std::endl;
         _players[name]->getOpenedField()->printField(out);
         if (!_players[name]->isSkip()) {
-            if (name == _hold_treasure) {
+            if (_players[name]->isTreasureKeeper()) {
                 out << std::endl;
                 std::cout << "You hold treasure" << std::endl;
                 out << std::endl;
             }
-            else if (!_hold_treasure.empty()) {
+            else if (_players[name]->isTreasureHold()) {
                 out << std::endl;
                 out << "!!!!!!!!!!!!ATTENTION!!!!!!!!!!!!" << std::endl;
                 out << std::endl;
@@ -80,37 +82,46 @@ bool GameManager::makeRound(std::istream& in, std::ostream& out) {
             Additional::operateTreasure(_players[name]->getPosition(), name, _players, _field, in, out,
                             _hold_treasure);
             auto action_information = _players[name]->chooseAction(in, out);
-            if (name != _hold_treasure) {
+            if (!_players[name]->isTreasureKeeper()) {
                 _players[name]->setActionMode("shoot", true);
             }
 
             auto action = ActionFactory::Instance().getAction(action_information.first);
-            /*bool success = */action->doAction(name, _players, _field, action_information.second,
+            action->doAction(name, _players, _field, action_information.second,
                                             in, out, _hold_treasure, _end_game);
             if (_end_game) {
                 return true;
             }
+            if (_players.find(name) == _players.end()) {
+                for (int i = 0; i < 25; i++) {
+                    std::cout << std::endl;
+                }
+                continue;
+            }
             _players[name]->getOpenedField()->printField(out);
-            std::string end_turn;
-            std::cout << "Enter anything to end turn" << std::endl;
-            std::cin >> end_turn;
-
+            if (!_players[name]->isBot()) {
+                std::string end_turn;
+                std::cout << "Enter anything to end turn" << std::endl;
+                std::cin >> end_turn;
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
             for (int i = 0; i < 25; i++) {
                 std::cout << std::endl;
             }
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
         else {
-            std::string end_turn;
-            out << "You've been shot, so you need one turn to heal" << std::endl;
-            std::cout << "Enter anything to end turn" << std::endl;
-            std::cin >> end_turn;
+            if (!_players[name]->isBot()) {
+                std::string end_turn;
+                out << "You've been shot, so you need one turn to heal" << std::endl;
+                std::cout << "Enter anything to end turn" << std::endl;
+                std::cin >> end_turn;
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
             for (int i = 0; i < 25; i++) {
                 std::cout << std::endl;
             }
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             _players[name]->setSkipMode(false);
             _players[name]->setActionMode("shoot", true);
         }
@@ -123,4 +134,8 @@ bool GameManager::makeRound(std::istream& in, std::ostream& out) {
 
 const std::string &GameManager::getHoldTreasure() {
     return _hold_treasure;
+}
+
+std::shared_ptr<Field> GameManager::getField() {
+    return _field;
 }

@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_executable(Task4_Game
         main.cpp
-        Player.cpp
-        Player.h
+        Players/Player.cpp
+        Players/Player.h
         GameManager.cpp
         GameManager.h
         Cells/Cell.h
@@ -20,4 +20,4 @@ add_executable(Task4_Game
         Actions/ActionFactory.cpp
         Actions/ActionFactory.h
         Actions/PossibleActions.cpp
-        Actions/PossibleActions.h)
+        Actions/PossibleActions.h Players/Bot.cpp Players/Bot.h)

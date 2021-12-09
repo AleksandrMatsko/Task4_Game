@@ -20,7 +20,7 @@ Field::Field() {
             //exception
         }
     }
-    /*std::srand(time(NULL));
+    /*std::srand(std::time(nullptr));
     int flip_x = std::rand() % 2;
     int flip_y = std::rand() % 2;
     if (flip_x) {
@@ -80,6 +80,7 @@ OpenField::OpenField(const std::pair<int, int> &pos, const int width, const int 
 }
 
 void OpenField::printField(std::ostream &out) {
+    out << "--------------------------" << std::endl;
     int num_fake_lines = 1;
     for (int i = 0; i < _width + 4; i++) {
         out << "? ";
@@ -107,6 +108,7 @@ void OpenField::printField(std::ostream &out) {
         }
     }
     out << std::endl;
+    out << "--------------------------" << std::endl;
 }
 
 char OpenField::viewCell(const std::pair<int, int> &pos) {
