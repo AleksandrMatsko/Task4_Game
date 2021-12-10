@@ -46,7 +46,6 @@ public:
     virtual bool isTreasureKeeper();
     virtual void setTreasureHold(bool treasure_is_hold);
     virtual void setTreasureKeeper(bool i_hold_treasure);
-    virtual void setExitFound(bool exit_found);
 };
 
 
