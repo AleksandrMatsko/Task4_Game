@@ -11,8 +11,6 @@ private:
     std::shared_ptr<OpenField> _open_field;
     bool _skip_turn;
     std::map<std::string, bool> _possible_actions;
-    bool _exit_found;
-    std::stack<Direction> _path_exit;
     bool _treasure_is_hold;
     bool _i_hold_treasure;
     std::stack<Direction> _path_to_undiscovered;
@@ -38,7 +36,6 @@ public:
     bool isTreasureKeeper();
     void setTreasureHold(bool treasure_is_hold);
     void setTreasureKeeper(bool i_hold_treasure);
-    void setExitFound(bool exit_found);
 };
 
 

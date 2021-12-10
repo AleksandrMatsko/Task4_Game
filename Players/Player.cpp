@@ -156,11 +156,4 @@ void Player::setTreasureHold(bool treasure_is_hold) {
 
 void Player::setTreasureKeeper(bool i_hold_treasure) {
     _i_hold_treasure = i_hold_treasure;
-    if (_i_hold_treasure) {
-        _treasure_is_hold = _i_hold_treasure;
-    }
-}
-
-void Player::setExitFound(bool exit_found) {
-    return;
 }
