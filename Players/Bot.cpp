@@ -22,7 +22,8 @@ std::map<Direction, std::pair<int, int>> Bot::getCandidates(std::pair<int, int> 
     std::map<Direction, std::pair<int, int>> candidates;
     for (auto & direction : all_directions) {
         auto new_pos = movePos(pos, direction);
-        auto cell_sym = _open_field->viewCell(new_pos);
+        auto open_field = this->getOpenedField();
+        auto cell_sym = open_field.viewCell(new_pos);
         if (cell_sym == 'P') {
             continue;
         }
@@ -39,8 +40,9 @@ std::map<Direction, std::pair<int, int>> Bot::getCandidates(std::pair<int, int> 
 }
 
 bool Bot::containsUndiscovered(std::map<Direction, std::pair<int, int>> &candidates) {
+    auto open_field = this->getOpenedField();
     for (auto & candidate : candidates) {
-        if (_open_field->viewCell(candidate.second) == '?') {
+        if (open_field.viewCell(candidate.second) == '?') {
             return true;
         }
     }
@@ -50,8 +52,9 @@ bool Bot::containsUndiscovered(std::map<Direction, std::pair<int, int>> &candida
 std::stack<Direction> Bot::findPathToUndiscovered(std::pair<int, int> pos) {
     std::list<std::pair<int, int>> queue;
     std::map<std::pair<int, int>, Direction> all_steps;
-    int width = _open_field->getWidth();
-    int height = _open_field->getHeight();
+    auto open_field = this->getOpenedField();
+    int width = open_field.getWidth();
+    int height = open_field.getHeight();
     int size = width * height;
     std::vector<bool> is_used(size);
     for (int i = 0; i < size; i ++) {
@@ -65,7 +68,7 @@ std::stack<Direction> Bot::findPathToUndiscovered(std::pair<int, int> pos) {
     queue.emplace_back(pos);
     while (!queue.empty()) {
         auto curr_pos = queue.front();
-        if (_open_field->viewCell(curr_pos) == '?') {
+        if (open_field.viewCell(curr_pos) == '?') {
             final_pos = curr_pos;
             break;
         }
@@ -92,32 +95,25 @@ std::stack<Direction> Bot::findPathToUndiscovered(std::pair<int, int> pos) {
     return ret;
 }
 
-Bot::Bot(const std::pair<int, int> &start_pos, int width,
-         int height, const std::map<std::string, bool> &possible_actions) : Player(start_pos, width, height, possible_actions) {
-    _pos = start_pos;
-    _open_field = std::make_shared<OpenField>(start_pos, width, height);
-    _skip_turn = false;
-    _treasure_is_hold = false;
-    _i_hold_treasure = false;
-}
+Bot::Bot(const std::pair<int, int> &start_pos, const std::list<std::string>& all_actions) : Player(start_pos, all_actions) {}
 
 std::pair<std::string, Direction> Bot::chooseAction(std::istream &in, std::ostream &out) {
     std::srand(std::time(nullptr));
     Direction direction = Direction::NONE;
     std::pair<std::string, Direction> ret;
-    if (!_treasure_is_hold || !isAvailable("shoot")) {
+    if (!isTreasureHold() || !isAvailable("shoot")) {
         if (!_path_to_undiscovered.empty()) {
             direction = _path_to_undiscovered.top();
             ret = std::make_pair("move", direction);
             _path_to_undiscovered.pop();
             return ret;
         }
-        auto candidates = getCandidates(_pos);
+        auto candidates = getCandidates(this->getPosition());
         bool contains_undiscovered = containsUndiscovered(candidates);
         if (contains_undiscovered) {
             std::list<Direction> to_del;
             for (auto & candidate : candidates) {
-                auto cell_sym = _open_field->viewCell(candidate.second);
+                auto cell_sym = this->getOpenedField().viewCell(candidate.second);
                 if (cell_sym != '?') {
                     to_del.emplace_back(candidate.first);
                 }
@@ -136,15 +132,15 @@ std::pair<std::string, Direction> Bot::chooseAction(std::istream &in, std::ostre
             while (!_path_to_undiscovered.empty()) {
                 _path_to_undiscovered.pop();
             }
-            _path_to_undiscovered = findPathToUndiscovered(_pos);
+            _path_to_undiscovered = findPathToUndiscovered(this->getPosition());
             direction = _path_to_undiscovered.top();
             ret = std::make_pair("move", direction);
             _path_to_undiscovered.pop();
             return ret;
         }
     }
-    if (_treasure_is_hold && isAvailable("shoot")) {
-        auto candidates = getCandidates(_pos);
+    if (isTreasureHold() && isAvailable("shoot")) {
+        auto candidates = getCandidates(this->getPosition());
         auto rand_index = rand() % all_directions.size();
         while (candidates.find(all_directions[rand_index]) == candidates.end()) {
             rand_index = rand() % all_directions.size();
@@ -159,51 +155,26 @@ std::pair<std::string, Direction> Bot::chooseAction(std::istream &in, std::ostre
     return ret;
 }
 
-void Bot::setPosition(const std::pair<int, int>& new_pos) {
-    _pos = new_pos;
-}
-
-std::pair<int, int> Bot::getPosition() {
-    return _pos;
-}
-
-bool Bot::isSkip() {
-    return _skip_turn;
-}
-
-void Bot::setActionMode(const std::string &action, bool mode) {
-    _possible_actions[action] = mode;
-}
-
-void Bot::setSkipMode(bool mode) {
-    _skip_turn = mode;
-}
-
-std::shared_ptr<OpenField> Bot::getOpenedField() {
-    return _open_field;
-}
-
-bool Bot::isAvailable(const std::string& action) {
-    return _possible_actions[action];
-}
-
 bool Bot::isBot() {
     return true;
 }
 
-bool Bot::isTreasureHold() {
-    return _treasure_is_hold;
+bool Bot::getAnswer(std::istream& in, std::ostream& out, char cell_sym) {
+    if (cell_sym == 'E') {
+        if (this->isTreasureKeeper()) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    return true;
 }
 
-bool Bot::isTreasureKeeper() {
-    return _i_hold_treasure;
-}
-
-void Bot::setTreasureHold(bool treasure_is_hold) {
-    _treasure_is_hold = treasure_is_hold;
-}
-
-void Bot::setTreasureKeeper(bool i_hold_treasure) {
-    _i_hold_treasure = i_hold_treasure;
+void Bot::endTurn(std::istream &in, std::ostream &out) {
+    in.clear();
+    for (int i = 0; i < 25; i++) {
+        out << std::endl;
+    }
 }
 

@@ -14,10 +14,10 @@ add_executable(Task4_Game
         Cells/CellFactory.h
         Cells/PossibleCells.cpp
         Cells/PossibleCells.h
-        Field.cpp
-        Field.h
+        Field/Field.cpp
+        Field/Field.h
         Actions/Action.h
         Actions/ActionFactory.cpp
         Actions/ActionFactory.h
         Actions/PossibleActions.cpp
-        Actions/PossibleActions.h Players/Bot.cpp Players/Bot.h Exceptions/Exception.cpp Exceptions/Exception.h)
+        Actions/PossibleActions.h Players/Bot.cpp Players/Bot.h Exceptions/Exception.cpp Exceptions/Exception.h Players/HumanPlayer.cpp Players/HumanPlayer.h Printer.cpp Printer.h Field/GeneralField.cpp Field/GeneralField.h Field/OpenField.cpp Field/OpenField.h Game.cpp Game.h)

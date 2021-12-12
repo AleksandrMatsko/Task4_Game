@@ -25,49 +25,18 @@ namespace {
 }
 
 namespace Additional {
-    bool GetAnswer(std::istream& in, std::ostream& out) {
-        out << std::endl;
-        out << "Please enter [yes] or [no] (without [])" << std::endl;
-        std::string answer;
-        while (true) {
-            in >> answer;
-            StrModifier::ToLower(answer);
-            if (answer == "yes") {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                return true;
-            }
-            if (answer == "no") {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                return false;
-            }
-            out << "Please enter [yes] or [no] (without []):" << std::endl;
-        }
-    }
-
     void operateTreasure(std::pair<int, int> pos, const std::string& player_name,
                          std::map<std::string, std::shared_ptr<Player>>& players,
-                         std::shared_ptr<Field>& field, std::istream& in, std::ostream& out,
+                         Field& field, std::istream& in, std::ostream& out,
                          std::string& hold_treasure) {
-        auto cell_sym = field->viewCell(pos);
+        auto cell_sym = field.viewCell(pos);
         auto cell = CellFactory::Instance().getCell(cell_sym);
         if (cell->getCellSym() == 'T') {
-            out << std::endl;
-            if (players[player_name]->isBot()) {
-                out << player_name << " picked up a treasure." << std::endl;
-                hold_treasure = player_name;
-                players[player_name]->setActionMode("shoot", false);
-                field->changeCell(pos, '0');
-                players[player_name]->setTreasureKeeper(true);
-                for (auto & player : players) {
-                    player.second->setTreasureHold(true);
-                }
-                return;
+            if (!players[player_name]->isBot()) {
+                Printer printer;
+                printer.printTreasureFound(out);
             }
-            out << "You found a treasure. Do you want to pick it up?" << std::endl;
-            out << "After picking up a treasure you can't shoot. What's your answer?" << std::endl;
-            bool answer = GetAnswer(in, out);
+            bool answer = players[player_name]->getAnswer(in, out, 'T');
             if (answer) {
                 hold_treasure = player_name;
                 players[player_name]->setTreasureKeeper(true);
@@ -75,7 +44,7 @@ namespace Additional {
                     player.second->setTreasureHold(true);
                 }
                 players[player_name]->setActionMode("shoot", false);
-                field->changeCell(pos, '0');
+                field.changeCell(pos, '0');
             }
         }
     }
@@ -83,77 +52,60 @@ namespace Additional {
 
 bool Move::doAction(const std::string& player_name,
                     std::map<std::string, std::shared_ptr<Player>>& players,
-                    std::shared_ptr<Field>& field, Direction direction, std::istream& in,
+                    Field& field, Direction direction, std::istream& in,
                     std::ostream& out, std::string& hold_treasure, bool& end_game) {
+    Printer printer;
     auto new_pos = players[player_name]->getPosition();
     new_pos = movePos(new_pos, direction);
-    auto cell_sym = field->viewCell(new_pos);
+    auto cell_sym = field.viewCell(new_pos);
     auto cell = CellFactory::Instance().getCell(cell_sym);
-    if (players[player_name]->isBot()) {
-        out << "move ";
-        printDirection(direction, out);
-        out << std::endl;
-    }
     if (cell->canStand()) {
         if (cell->canInteract()) {
             char what = cell->getCellSym();
             if (what == 'E') {
-                if (players[player_name]->isBot()) {
-                    if (players[player_name]->isTreasureKeeper()) {
-                        end_game = true;
-                        return true;
-                    }
+                if (!players[player_name]->isBot()) {
+                    printer.printExitFound(out);
                 }
-                else {
-                    out << "You found an exit. Do you want to leave maze?" << std::endl;
-                    out << "If you don't hold a treasure you will leave the game. What's your answer" << std::endl;
-                    bool answer = Additional::GetAnswer(in, out);
-                    if (answer && !players[player_name]->isTreasureKeeper()) {
-                        players.erase(player_name);
-                        if (players.empty()) {
-                            end_game = true;
-                        }
-                        return true;
-                    }
-                    if (answer && players[player_name]->isTreasureKeeper()) {
+                bool answer = players[player_name]->getAnswer(in, out, 'E');
+                if (answer && !players[player_name]->isTreasureKeeper()) {
+                    players.erase(player_name);
+                    if (players.empty()) {
                         end_game = true;
-                        return true;
                     }
-                    if (!answer) {
-                        players[player_name]->getOpenedField()->changeCell(new_pos, what);
-                        return false;
+                    return true;
+                }
+                if (answer && players[player_name]->isTreasureKeeper()) {
+                    end_game = true;
+                    return true;
+                }
+                if (!answer) {
+                    if (!players[player_name]->isBot()) {
+                        players[player_name]->getOpenedField().changeCell(new_pos, what);
                     }
+                    return false;
                 }
                 new_pos = players[player_name]->getPosition();
             }
         }
         Additional::operateTreasure(new_pos, player_name, players, field, in, out, hold_treasure);
         auto pos = players[player_name]->getPosition();
-        auto open_field = players[player_name]->getOpenedField();
-        open_field->changeCell(pos, field->viewCell(pos));
-        open_field->changeCell(new_pos, 'P');
+        players[player_name]->getOpenedField().changeCell(pos, field.viewCell(pos));
+        players[player_name]->getOpenedField().changeCell(new_pos, 'P');
         players[player_name]->setPosition(new_pos);
         return true;
     }
     else {
-        out << "You find unpassable cell" << std::endl;
-        auto opened_field = players[player_name]->getOpenedField();
-        opened_field->changeCell(new_pos, field->viewCell(new_pos));
+        players[player_name]->getOpenedField().changeCell(new_pos, field.viewCell(new_pos));
         return false;
     }
 }
 
 bool Shoot::doAction(const std::string& player_name,
                      std::map<std::string, std::shared_ptr<Player>>& players,
-                     std::shared_ptr<Field>& field, Direction direction, std::istream& in,
+                     Field& field, Direction direction, std::istream& in,
                      std::ostream& out, std::string& hold_treasure, bool& end_game) {
-    if (players[player_name]->isBot()) {
-        out << "shoot ";
-        printDirection(direction, out);
-        out << std::endl;
-    }
     auto bullet_pos = players[player_name]->getPosition();
-    auto cell_sym = field->viewCell(bullet_pos);
+    auto cell_sym = field.viewCell(bullet_pos);
     auto cell = CellFactory::Instance().getCell(cell_sym);
     bool anyone_shot = false;
     while (cell->canShootThrough()) {
@@ -172,31 +124,13 @@ bool Shoot::doAction(const std::string& player_name,
                     for (auto & player : players) {
                         player.second->setTreasureHold(false);
                     }
-                    field->changeCell(pos, 'T');
+                    field.changeCell(pos, 'T');
                 }
             }
         }
         bullet_pos = movePos(bullet_pos, direction);
-        cell_sym = field->viewCell(bullet_pos);
+        cell_sym = field.viewCell(bullet_pos);
         cell = CellFactory::Instance().getCell(cell_sym);
-    }
-    if (anyone_shot) {
-        out << std::endl;
-        out << "=================================" << std::endl;
-        out << std::endl;
-        out << "You've shot somebody" << std::endl;
-        out << std::endl;
-        out << "=================================" << std::endl;
-        out << std::endl;
-    }
-    else {
-        out << std::endl;
-        out << "=================================" << std::endl;
-        out << std::endl;
-        out << "You haven't shot anybody" << std::endl;
-        out << std::endl;
-        out << "=================================" << std::endl;
-        out << std::endl;
     }
     players[player_name]->setActionMode("shoot", false);
     Additional::operateTreasure(players[player_name]->getPosition(), player_name, players, field, in, out,
