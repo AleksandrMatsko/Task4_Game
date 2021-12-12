@@ -1,8 +1,6 @@
 #ifndef TASK4_GAME_ACTIONFACTORY_H
 #define TASK4_GAME_ACTIONFACTORY_H
 
-#include <list>
-#include <functional>
 #include "Action.h"
 #include "../Exceptions/Exception.h"
 

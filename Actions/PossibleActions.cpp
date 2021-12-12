@@ -48,9 +48,9 @@ namespace Additional {
 
     void operateTreasure(std::pair<int, int> pos, const std::string& player_name,
                          std::map<std::string, std::shared_ptr<Player>>& players,
-                         std::shared_ptr<Field>& field, std::istream& in, std::ostream& out,
+                         Field& field, std::istream& in, std::ostream& out,
                          std::string& hold_treasure) {
-        auto cell_sym = field->viewCell(pos);
+        auto cell_sym = field.viewCell(pos);
         auto cell = CellFactory::Instance().getCell(cell_sym);
         if (cell->getCellSym() == 'T') {
             out << std::endl;
@@ -58,7 +58,7 @@ namespace Additional {
                 out << player_name << " picked up a treasure." << std::endl;
                 hold_treasure = player_name;
                 players[player_name]->setActionMode("shoot", false);
-                field->changeCell(pos, '0');
+                field.changeCell(pos, '0');
                 players[player_name]->setTreasureKeeper(true);
                 for (auto & player : players) {
                     player.second->setTreasureHold(true);
@@ -75,7 +75,7 @@ namespace Additional {
                     player.second->setTreasureHold(true);
                 }
                 players[player_name]->setActionMode("shoot", false);
-                field->changeCell(pos, '0');
+                field.changeCell(pos, '0');
             }
         }
     }
@@ -83,11 +83,11 @@ namespace Additional {
 
 bool Move::doAction(const std::string& player_name,
                     std::map<std::string, std::shared_ptr<Player>>& players,
-                    std::shared_ptr<Field>& field, Direction direction, std::istream& in,
+                    Field& field, Direction direction, std::istream& in,
                     std::ostream& out, std::string& hold_treasure, bool& end_game) {
     auto new_pos = players[player_name]->getPosition();
     new_pos = movePos(new_pos, direction);
-    auto cell_sym = field->viewCell(new_pos);
+    auto cell_sym = field.viewCell(new_pos);
     auto cell = CellFactory::Instance().getCell(cell_sym);
     if (players[player_name]->isBot()) {
         out << "move ";
@@ -120,7 +120,7 @@ bool Move::doAction(const std::string& player_name,
                         return true;
                     }
                     if (!answer) {
-                        players[player_name]->getOpenedField()->changeCell(new_pos, what);
+                        players[player_name]->getOpenedField().changeCell(new_pos, what);
                         return false;
                     }
                 }
@@ -129,23 +129,21 @@ bool Move::doAction(const std::string& player_name,
         }
         Additional::operateTreasure(new_pos, player_name, players, field, in, out, hold_treasure);
         auto pos = players[player_name]->getPosition();
-        auto open_field = players[player_name]->getOpenedField();
-        open_field->changeCell(pos, field->viewCell(pos));
-        open_field->changeCell(new_pos, 'P');
+        players[player_name]->getOpenedField().changeCell(pos, field.viewCell(pos));
+        players[player_name]->getOpenedField().changeCell(new_pos, 'P');
         players[player_name]->setPosition(new_pos);
         return true;
     }
     else {
         out << "You find unpassable cell" << std::endl;
-        auto opened_field = players[player_name]->getOpenedField();
-        opened_field->changeCell(new_pos, field->viewCell(new_pos));
+        players[player_name]->getOpenedField().changeCell(new_pos, field.viewCell(new_pos));
         return false;
     }
 }
 
 bool Shoot::doAction(const std::string& player_name,
                      std::map<std::string, std::shared_ptr<Player>>& players,
-                     std::shared_ptr<Field>& field, Direction direction, std::istream& in,
+                     Field& field, Direction direction, std::istream& in,
                      std::ostream& out, std::string& hold_treasure, bool& end_game) {
     if (players[player_name]->isBot()) {
         out << "shoot ";
@@ -153,7 +151,7 @@ bool Shoot::doAction(const std::string& player_name,
         out << std::endl;
     }
     auto bullet_pos = players[player_name]->getPosition();
-    auto cell_sym = field->viewCell(bullet_pos);
+    auto cell_sym = field.viewCell(bullet_pos);
     auto cell = CellFactory::Instance().getCell(cell_sym);
     bool anyone_shot = false;
     while (cell->canShootThrough()) {
@@ -172,12 +170,12 @@ bool Shoot::doAction(const std::string& player_name,
                     for (auto & player : players) {
                         player.second->setTreasureHold(false);
                     }
-                    field->changeCell(pos, 'T');
+                    field.changeCell(pos, 'T');
                 }
             }
         }
         bullet_pos = movePos(bullet_pos, direction);
-        cell_sym = field->viewCell(bullet_pos);
+        cell_sym = field.viewCell(bullet_pos);
         cell = CellFactory::Instance().getCell(cell_sym);
     }
     if (anyone_shot) {

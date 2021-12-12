@@ -37,10 +37,11 @@ int main() {
         }
     }
     bool end_game = false;
+    GameManager manager(player_names);
     while (!end_game) {
-        end_game = GameManager::Instance(player_names).makeRound(std::cin, std::cout);
+        end_game = manager.makeRound(std::cin, std::cout);
     }
-    std::string winner = GameManager::Instance(player_names).getHoldTreasure();
+    std::string winner = manager.getHoldTreasure();
     std::cout << std::endl;
     if (winner.empty()) {
         std::cout << "Nobody win" << std::endl;
@@ -49,6 +50,6 @@ int main() {
         std::cout << "!!!  Winner: " << winner << "  !!!" << std::endl;
     }
     std::cout << std::endl;
-    GameManager::Instance(player_names).getField()->printField(std::cout);
+    manager.getField().printField(std::cout);
     return 0;
 }
