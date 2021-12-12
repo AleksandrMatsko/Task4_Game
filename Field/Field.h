@@ -7,6 +7,16 @@
 #include <ctime>
 #include "../Cells/CellFactory.h"
 
+enum class Direction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    NONE
+};
+
+Direction operator!(Direction direction);
+
 class Field {
 protected:
     std::vector<char> _field;
@@ -16,7 +26,7 @@ protected:
 public:
     Field();
 
-    virtual void printField(std::ostream& out) = 0;
+    virtual void printField(std::ostream& out) = 0 ;
 
     void changeCell(const std::pair<int, int>& pos, char new_cell_sym);
 

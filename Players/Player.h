@@ -5,22 +5,12 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include "../Printer.h"
 #include "../Field/OpenField.h"
 
 namespace StrModifier {
     void ToLower(std::string& str);
 }
-
-enum class Direction {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    NONE
-};
-
-Direction operator!(Direction direction);
-void printDirection(Direction direction, std::ostream& out);
 
 class Player {
 private:
@@ -36,6 +26,8 @@ public:
 
     virtual std::pair<std::string, Direction> chooseAction(std::istream& in, std::ostream& out) = 0;
     virtual bool isBot() = 0;
+    virtual bool getAnswer(std::istream& in, std::ostream& out, char cell_sym) = 0;
+    virtual void endTurn(std::istream& in, std::ostream& out) = 0;
 
     void setPosition(const std::pair<int, int>& new_pos);
     void setActionMode(const std::string& action, bool mode);

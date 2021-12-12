@@ -8,42 +8,6 @@ namespace StrModifier {
     }
 }
 
-Direction operator!(Direction direction) {
-    if (direction == Direction::UP) {
-        return Direction::DOWN;
-    }
-    else if (direction == Direction::DOWN) {
-        return Direction::UP;
-    }
-    else if(direction == Direction::RIGHT) {
-        return Direction::LEFT;
-    }
-    else if(direction == Direction::LEFT) {
-        return Direction::RIGHT;
-    }
-    else {
-        return Direction::NONE;
-    }
-}
-
-void printDirection(Direction direction, std::ostream& out) {
-    if (direction == Direction::UP) {
-        out << "UP";
-    }
-    else if (direction == Direction::DOWN) {
-        out << "DOWN";
-    }
-    else if(direction == Direction::RIGHT) {
-        out << "RIGHT";
-    }
-    else if(direction == Direction::LEFT) {
-        out << "LEFT";
-    }
-    else {
-        out << "NONE";
-    }
-}
-
 Player::Player(const std::pair<int, int>& start_pos, const std::list<std::string>& all_actions) {
     _pos = start_pos;
     _open_field = OpenField();

@@ -159,3 +159,22 @@ bool Bot::isBot() {
     return true;
 }
 
+bool Bot::getAnswer(std::istream& in, std::ostream& out, char cell_sym) {
+    if (cell_sym == 'E') {
+        if (this->isTreasureKeeper()) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Bot::endTurn(std::istream &in, std::ostream &out) {
+    in.clear();
+    for (int i = 0; i < 25; i++) {
+        out << std::endl;
+    }
+}
+

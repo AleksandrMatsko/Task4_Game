@@ -9,6 +9,8 @@ public:
 
     std::pair<std::string, Direction> chooseAction(std::istream& in, std::ostream& out) override;
     bool isBot() override;
+    bool getAnswer(std::istream& in, std::ostream& out, char cell_sym) override;
+    void endTurn(std::istream& in, std::ostream& out) override;
 };
 
 

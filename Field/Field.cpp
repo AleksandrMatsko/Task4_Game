@@ -1,5 +1,23 @@
 #include "Field.h"
 
+Direction operator!(Direction direction) {
+    if (direction == Direction::UP) {
+        return Direction::DOWN;
+    }
+    else if (direction == Direction::DOWN) {
+        return Direction::UP;
+    }
+    else if(direction == Direction::RIGHT) {
+        return Direction::LEFT;
+    }
+    else if(direction == Direction::LEFT) {
+        return Direction::RIGHT;
+    }
+    else {
+        return Direction::NONE;
+    }
+}
+
 Field::Field() {
     _width = 9;
     _height = 9;

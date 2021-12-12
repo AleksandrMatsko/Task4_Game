@@ -2,9 +2,10 @@
 
 namespace {
     std::string GetNameAction(std::istream& in, std::ostream& out, std::map<std::string, bool> possible_actions) {
-        out << "Please choose one action:" << std::endl;
+        Printer printer;
         std::string action;
         while (true) {
+            printer.printChoiceAction(out);
             in >> action;
             StrModifier::ToLower(action);
             if (possible_actions.find(action) != possible_actions.end()) {
@@ -13,14 +14,14 @@ namespace {
                     return action;
                 }
             }
-            out << "Please choose one action:" << std::endl;
         }
     }
 
     Direction GetDirection(std::istream& in, std::ostream& out) {
-        out << "Please choose 1 of 4 directions (up, down, left, right):" << std::endl;
+        Printer printer;
         std::string direction;
         while (true) {
+            printer.printChoiceDirection(out);
             in >> direction;
             StrModifier::ToLower(direction);
             if (direction == "up") {
@@ -35,7 +36,6 @@ namespace {
             else if (direction == "right") {
                 return Direction::RIGHT;
             }
-            out << "Please choose 1 of 4 directions (up, down, left, right):" << std::endl;
         }
     }
 }
@@ -44,13 +44,9 @@ HumanPlayer::HumanPlayer(const std::pair<int, int>& start_pos,
                          const std::list<std::string>& all_actions) : Player(start_pos, all_actions) {}
 
 std::pair<std::string, Direction> HumanPlayer::chooseAction(std::istream& in, std::ostream& out) {
-    out << "You can do these actions:" << std::endl;
-    auto possible_actions = getPossibleActions();
-    for (auto & it: possible_actions) {
-        if (it.second) {
-            out << "- " << it.first << std::endl;
-        }
-    }
+    auto possible_actions = this->getPossibleActions();
+    Printer printer;
+    printer.printPossibleActions(out, possible_actions);
     auto action_name = GetNameAction(in, out, possible_actions);
     std::cin.clear();
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -62,4 +58,34 @@ std::pair<std::string, Direction> HumanPlayer::chooseAction(std::istream& in, st
 
 bool HumanPlayer::isBot() {
     return false;
+}
+
+bool HumanPlayer::getAnswer(std::istream &in, std::ostream &out, char cell_sym) {
+    Printer printer;
+    std::string answer;
+    while (true) {
+        printer.printChoiceAnswer(out);
+        in >> answer;
+        StrModifier::ToLower(answer);
+        if (answer == "yes") {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return true;
+        }
+        if (answer == "no") {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            return false;
+        }
+    }
+}
+
+void HumanPlayer::endTurn(std::istream &in, std::ostream &out) {
+    std::string end_turn;
+    in >> end_turn;
+    in.clear();
+    in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    for (int i = 0; i < 25; i++) {
+        out << std::endl;
+    }
 }

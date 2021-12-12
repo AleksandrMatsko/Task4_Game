@@ -6,7 +6,6 @@
 #include "../Players/Bot.h"
 
 namespace Additional {
-    bool GetAnswer(std::istream& in, std::ostream& out);
     void operateTreasure(std::pair<int, int> pos, const std::string& player_name,
                          std::map<std::string, std::shared_ptr<Player>>& players,
                          Field& field, std::istream& in, std::ostream& out,
